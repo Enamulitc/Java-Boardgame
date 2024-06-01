@@ -27,4 +27,4 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 
 sudo docker volume create soner-data 
 
-sudo docker run -d --name sonar -p 9000:9000 soner-data:/soner-data sonarqube:lts-community
+sudo docker run -d --name sonar -p 9000:9000 -v soner-data:/soner-data sonarqube:lts-community
