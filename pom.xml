@@ -122,7 +122,7 @@
     </repository>
     <snapshotRepository>
        <id>maven-snapshots</id>
-       <url>http://54.169.86.63:8081/repository/maven-releases/</url >
+       <url>http://54.169.86.63:8081/repository/maven-snapshots/</url>
     </snapshotRepository>
 </distributionManagement>
 
