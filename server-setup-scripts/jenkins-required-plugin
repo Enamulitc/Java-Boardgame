@@ -1,0 +1,12 @@
+jenkins Required Plugins
+=============================
+Eclipse Temurin installer
+Config File Provider
+Pipeline Maven Integration
+SonarQube Scanner
+Docker
+Docker Pipeline
+Kubernetes Client API
+Kubernetes Credentials
+Kubernetes
+Kubernetes CLI
