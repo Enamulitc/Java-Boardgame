@@ -9,12 +9,13 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_REPO = 'enam92/boardshack-dev'
+        BASE_VERSION = '1.0.0'  // This should be updated manually for major/minor/patch versions
     }
 
     stages {
         stage('Git Checkout') {
             steps {
-               git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/Enamulitc/Java-Boardgame.git'
+                git branch: 'main', credentialsId: 'git-cred', url: 'https://github.com/Enamulitc/Java-Boardgame.git'
             }
         }
         stage('Compile') {
@@ -43,32 +44,33 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                  waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token' 
                 }
             }
         }
         stage('Build') {
             steps {
-               sh "mvn package"
+                sh "mvn package"
             }
         }
         stage('Publish To Nexus') {
             steps {
-               withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                withMaven(globalMavenSettingsConfig: 'global-settings', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
                     sh "mvn deploy"
                 }
             }
         }
         stage('Build & Tag Docker Image') {
             steps {
-               script {
-                   def gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                   def imageTag = "version-${gitCommit}"
-                   env.IMAGE_TAG = "${IMAGE_REPO}:${imageTag}"
-                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                       sh "docker build -t ${IMAGE_TAG} ."
-                   }
-               }
+                script {
+                    def gitCommit = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    def buildNumber = currentBuild.number
+                    def imageTag = "${BASE_VERSION}-${buildNumber}-${gitCommit}"
+                    env.IMAGE_TAG = "${IMAGE_REPO}:${imageTag}"
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker build -t ${IMAGE_TAG} ."
+                    }
+                }
             }
         }
         stage('Docker Image Scan') {
@@ -78,23 +80,23 @@ pipeline {
         }
         stage('Push Docker Image') {
             steps {
-               script {
-                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                       sh "docker push ${IMAGE_TAG}"
-                   }
-               }
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh "docker push ${IMAGE_TAG}"
+                    }
+                }
             }
         }
         stage('Deploy To Kubernetes') {
             steps {
-               withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://18.139.40.51:6443') {
+                withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://18.139.40.51:6443') {
                     sh "kubectl set image deployment/boardgame-deployment boardgame=${IMAGE_TAG} -n webapps"
                 }
             }
         }
         stage('Verify the Deployment') {
             steps {
-               withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://18.139.40.51:6443') {
+                withKubeConfig(caCertificate: '', clusterName: 'kubernetes', contextName: '', credentialsId: 'k8-cred', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: 'https://18.139.40.51:6443') {
                     sh "kubectl get pods -n webapps"
                     sh "kubectl get svc -n webapps"
                 }
@@ -102,3 +104,4 @@ pipeline {
         }
     }
 }
+
