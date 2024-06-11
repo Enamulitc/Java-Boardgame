@@ -13,7 +13,7 @@ To create an Ubuntu EC2 instance in AWS, follow these steps:
 
 4. **Choose an Amazon Machine Image (AMI)**:
    - In the "Step 1: Choose an Amazon Machine Image (AMI)" section, select "Ubuntu" from the list of available AMIs.
-   - Choose the Ubuntu version you want to use. For example, "Ubuntu Server 20.04 LTS".
+   - Choose the Ubuntu version you want to use. For example, "Ubuntu Server 22.04 LTS".
    - Click "Select".
 
 5. **Choose an Instance Type**:
@@ -34,7 +34,7 @@ To create an Ubuntu EC2 instance in AWS, follow these steps:
 
 9. **Configure Security Group**:
    - In the "Step 6: Configure Security Group" section, configure the security group to allow SSH access (port 22) from your IP address.
-   - You may also want to allow other ports based on your requirements (e.g., HTTP, HTTPS) as in this pic ![Alt text](https://github.com/Enamulitc/Java-Boardgame/tree/main/server-setup-scripts/fw.png)
+   - You may also want to allow other ports based on your requirements (HTTP, HTTPS) as in this pic! (https://github.com/Enamulitc/Java-Boardgame/tree/main/server-setup-scripts/fw.png)
    - Click "Review and Launch".
 
 10. **Review and Launch**:
